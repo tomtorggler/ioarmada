@@ -1,4 +1,4 @@
-﻿$version = "0.5.4"
+﻿$version = "0.5.5"
 
 function Write-DiskSpdLog {
     param(
@@ -66,6 +66,7 @@ function Test-FileVersion {
             if($update) {
                 Write-DiskSpdLog "updating: $($LocalPath) with $($RemotePath)"
                 Copy-Item -Path $RemotePath -Destination $LocalPath -Force -PassThru
+                Unblock-File -Path $LocalPath
             } else { 
                 #$false 
             }
@@ -75,11 +76,19 @@ function Test-FileVersion {
 }
 
 function Update-File {
+<#
+.Synopsis
+   Copy remote file to local path.
+.DESCRIPTION
+   This function copies a remote file to a local path if the local path does not exist. Otherwise it calls
+   Test-FileVersion to check whether the remote file is newer.
+#>
     param($LocalPath,$RemotePath)
     
     if(-not(Test-Path $LocalPath)) {
         Write-DiskSpdLog -message "$($LocalPath) NOT present, copy from  $($RemotePath)"
         Copy-Item -Path $RemotePath -Destination $LocalPath -Force
+        Unblock-File -Path $LocalPath
     } else {
         Write-DiskSpdLog -message "$($LocalPath) present, checking for update at $($RemotePath)"
         Test-FileVersion -localPath $LocalPath -remotePath $RemotePath -update
@@ -87,6 +96,13 @@ function Update-File {
 }
 
 function Invoke-NetUse {
+<#
+.Synopsis
+   Mount a network path as local drive letter.
+.DESCRIPTION
+   This function uses "net use" to mount a given remote path to drive letter on the local system. The defaul behaviour is 
+   to remove existing mappings before creating a new one.
+#>
     param(
         [validatepattern("^\w:$")]
         [string]$DriveLetter,
@@ -120,6 +136,7 @@ Update-File -LocalPath C:\diskspd-run.ps1 -RemotePath Y:\diskspd-run.ps1
 if((Update-File -LocalPath C:\diskspd-workernode.ps1 -RemotePath y:\diskspd-workernode.ps1) -ne $null){
     Write-DiskSpdLog -message "updating myself, gonna reboot!"
     Restart-Computer -Force
+    end
 } 
 
 $run = "C:\diskspd-run.ps1"
