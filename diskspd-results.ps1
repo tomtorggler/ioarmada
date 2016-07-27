@@ -9,10 +9,12 @@ use like this, where ResultPath points to the ioarmada share as worker nodes sav
 #>
 
 param(
-    $ResultPath
+    $ResultPath,
+    $ResultFilter = "diskspd-result-*.txt",
+    $OutFileName = "ioarmada-results.xlsx"
 )
 
-$files = Get-ChildItem -Path $ResultPath -Filter "diskspd-result*txt"
+$files = Get-ChildItem -Path $ResultPath -Filter $ResultFilter
 
 function get-latency( $x ) {
 
@@ -66,11 +68,12 @@ $files | foreach {
 
 } | 
 ConvertFrom-Csv -Delimiter ',' -Header 'ComputerName','RunTime','WriteRatio','Threads','Outstanding','BlockSize','ReadIOPs','ReadMbps','WriteIOPs','WriteMbps','25th','50th','75th','90th','99th','999th','Max' |
-Export-Excel -Path (join-path -Path $ResultPath -ChildPath export-excel.xlsx) -WorkSheetname Overall
+Export-Excel -Path (join-path -Path $ResultPath -ChildPath $OutFileName) -WorkSheetname Overall
 
 foreach($file in $files){
-    $name = $file.BaseName.replace('diskspd-result-',$null)
-    
+    $name = $file.BaseName -replace('diskspd-result-',$null) -replace("-\d{8}T\d{10}",$null)
+    $outFile = 
+
     $chartLat = New-ExcelChart -Title Latency `
     -ChartType LineStacked -Header "Latency" `
     -YRange @("Latency_$name[TotalMilliseconds]","Latency_$name[ReadMilliseconds]","Latency_$name[WriteMilliseconds]" )`
@@ -90,7 +93,7 @@ foreach($file in $files){
     $latency = $xml.Results.timespan.Latency.Bucket | select Percentile,ReadMilliseconds,WriteMilliseconds,TotalMilliseconds 
     $iops = $xml.Results.timespan.Iops.Bucket | select SampleMillisecond,Read,Write,Total
 
-    $latency | Export-Excel -Path (join-path -Path $ResultPath -ChildPath export-excel.xlsx) -AutoSize -WorkSheetname "lat_$Name" -ExcelChartDefinition $chartLat -TableName "Latency_$name"
-    $iops | Export-Excel -Path (join-path -Path $ResultPath -ChildPath export-excel.xlsx) -AutoSize -WorkSheetname "iops_$name" -ExcelChartDefinition $chartIO -TableName "IOPS_$name"
+    $latency | Export-Excel -Path (join-path -Path $ResultPath -ChildPath $OutFileName) -AutoSize -WorkSheetname "lat_$Name" -ExcelChartDefinition $chartLat -TableName "Latency_$name"
+    $iops | Export-Excel -Path (join-path -Path $ResultPath -ChildPath $OutFileName) -AutoSize -WorkSheetname "iops_$name" -ExcelChartDefinition $chartIO -TableName "IOPS_$name"
 }
 

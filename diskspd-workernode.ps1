@@ -1,4 +1,4 @@
-﻿$version = "0.5.5"
+﻿$version = "0.5.6"
 
 function Write-DiskSpdLog {
     param(
@@ -18,7 +18,7 @@ function Write-DiskSpdLog {
         $filename = "log"
     }
 
-    $logPath = Join-Path -Path $parentPath -ChildPath "diskspd-$filename-$((Get-NetAdapter)[0].PermanentAddress).txt"
+    $logPath = Join-Path -Path $parentPath -ChildPath "diskspd-$filename-$((Get-NetAdapter)[0].PermanentAddress)-$(Get-Date -Format FileDateTime).txt"
     
     if ($isResult) {
         Add-Content -Path $logPath -Value $message -Force
