@@ -68,10 +68,10 @@ $files | foreach {
 
 } | 
 ConvertFrom-Csv -Delimiter ',' -Header 'ComputerName','RunTime','WriteRatio','Threads','Outstanding','BlockSize','ReadIOPs','ReadMbps','WriteIOPs','WriteMbps','25th','50th','75th','90th','99th','999th','Max' |
-Export-Excel -Path (join-path -Path $ResultPath -ChildPath $OutFileName) -WorkSheetname Overall
+Export-Excel -Path (join-path -Path $ResultPath -ChildPath $OutFileName) -WorkSheetname Overall -IncludePivotTable -PivotRows "ComputerName" -PivotData @('ReadIOPs','ReadMbps','WriteIOPs','WriteMbps') 
 
 foreach($file in $files){
-    $name = $file.BaseName.replace('diskspd-result-\d{8}T\d{10}',$null)
+    $name = $file.BaseName -replace("diskspd-result-\d{18}-",$null)
 
     $chartLat = New-ExcelChart -Title Latency `
     -ChartType LineStacked -Header "Latency" `

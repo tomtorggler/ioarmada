@@ -13,7 +13,7 @@ function Write-DiskSpdLog {
         $parentPath = "Y:"
     }
     if($isResult) {
-        $filename = "result-$(Get-Date -Format yyyymmddThhmmssmsms)" 
+        $filename = "result-$((Get-Date).ToFileTime())" 
     } else {
         $filename = "log"
     }
