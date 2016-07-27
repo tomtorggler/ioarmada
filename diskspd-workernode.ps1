@@ -13,14 +13,12 @@ function Write-DiskSpdLog {
         $parentPath = "Y:"
     }
     if($isResult) {
-        $filename = "result"
-        $Appendix = Get-Date -Format yyyymmddThhmmssmsms
+        $filename = "result-$(Get-Date -Format yyyymmddThhmmssmsms)" 
     } else {
         $filename = "log"
-        $Appendix = "log"
     }
 
-    $logPath = Join-Path -Path $parentPath -ChildPath "diskspd-$filename-$((Get-NetAdapter)[0].PermanentAddress)-$Appendix.txt"
+    $logPath = Join-Path -Path $parentPath -ChildPath "diskspd-$filename-$((Get-NetAdapter)[0].PermanentAddress).txt"
     
     if ($isResult) {
         Add-Content -Path $logPath -Value $message -Force

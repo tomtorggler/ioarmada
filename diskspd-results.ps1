@@ -71,8 +71,7 @@ ConvertFrom-Csv -Delimiter ',' -Header 'ComputerName','RunTime','WriteRatio','Th
 Export-Excel -Path (join-path -Path $ResultPath -ChildPath $OutFileName) -WorkSheetname Overall
 
 foreach($file in $files){
-    $name = $file.BaseName -replace('diskspd-result-',$null) -replace("-\d{8}T\d{10}",$null)
-    $outFile = 
+    $name = $file.BaseName.replace('diskspd-result-\d{8}T\d{10}',$null)
 
     $chartLat = New-ExcelChart -Title Latency `
     -ChartType LineStacked -Header "Latency" `
