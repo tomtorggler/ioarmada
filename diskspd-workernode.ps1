@@ -14,7 +14,7 @@ function Write-DiskSpdLog {
     }
     if($isResult) {
         $filename = "result"
-        $Appendix = Get-Date -Format FileDateTime
+        $Appendix = Get-Date -Format yyyymmddThhmmssmsms
     } else {
         $filename = "log"
         $Appendix = "log"
